@@ -95,7 +95,7 @@ class Actuator(object):
 
         for epoch in range(self.args.train_epochs):
             iter_count = 0
-            train_loss = []
+            train_loss, train_acc = [], []
 
             self.model.train()
             epoch_time = time.time()
@@ -112,13 +112,16 @@ class Actuator(object):
 
                 loss = criterion(outputs, batch_y)
                 loss.requires_grad_(True)
+                acc = float((outputs == batch_y).sum().item()) / outputs.numel()
+
                 train_loss.append(loss.item())
+                train_acc.append(acc)
 
                 if (i + 1) % 100 == 0:
-                    print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
+                    print("\titers: {0}, epoch: {1} | loss: {2:.7f} | acc: {3:.2}%".format(i + 1, epoch + 1, loss.item(), acc*100), end=" ")
                     speed = (time.time() - time_now) / iter_count
                     left_time = speed * ((self.args.train_epochs - epoch) * train_steps - i)
-                    print('\tspeed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
+                    print('| speed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
                     iter_count = 0
                     time_now = time.time()
 
@@ -132,11 +135,12 @@ class Actuator(object):
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
+            train_acc = np.average(train_acc)
             vali_loss = self.vali(vali_data, vali_loader, criterion)
             test_loss = self.vali(test_data, test_loader, criterion)
 
-            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
-                epoch + 1, train_steps, train_loss, vali_loss, test_loss))
+            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Train Acc: {2:.4f}% Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
+                epoch + 1, train_steps, train_loss, train_acc, vali_loss, test_loss))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
                 print("Early stopping")
@@ -188,10 +192,8 @@ class Actuator(object):
 
         preds = np.concatenate(preds, axis=0)
         trues = np.concatenate(trues, axis=0)
-        print('test shape:', preds.shape, trues.shape)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
-        print('test shape:', preds.shape, trues.shape)
 
         # result save
         folder_path = './results/' + setting + '/'
@@ -280,7 +282,5 @@ class Actuator(object):
         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
         outputs_ = torch.max(outputs, dim=-1)[1].unsqueeze(dim=-1)
-
-        # float((torch.max(output, dim=-1)[1] == y).sum().item())
 
         return outputs_, batch_y

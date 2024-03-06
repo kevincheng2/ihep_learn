@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from data_provider.dataset_loader import data_provider
-from models import Informer, Autoformer, Transformer, Reformer
+from models import Informer, Autoformer, Transformer, Reformer, LSTM
 from utils.tools import EarlyStopping, adjust_learning_rate, visual
 from utils.metrics import metric
 
@@ -27,6 +27,7 @@ class Actuator(object):
             'Transformer': Transformer,
             'Informer': Informer,
             'Reformer': Reformer,
+            'LSTM': LSTM,
         }
         model = model_dict[self.args.model].Model(self.args).float()
 
@@ -110,6 +111,7 @@ class Actuator(object):
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
                 loss = criterion(outputs, batch_y)
+                loss.requires_grad_(True)
                 train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:
@@ -252,7 +254,7 @@ class Actuator(object):
         return model_optim
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
+        criterion = nn.MSELoss(reduction="mean")
         return criterion
 
     def _predict(self, batch_x, batch_y, batch_x_mark, batch_y_mark):
@@ -277,11 +279,8 @@ class Actuator(object):
         outputs = outputs[:, -self.args.pred_len:, :]
         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
-        outputs_shape = torch.max(outputs, dim=-1)[1].unsqueeze(dim=-1)
-
-        print("batch_y shape:", batch_y.shape)
-        print("outputs_shape shape:", outputs_shape.shape)
+        outputs_ = torch.max(outputs, dim=-1)[1].unsqueeze(dim=-1)
 
         # float((torch.max(output, dim=-1)[1] == y).sum().item())
 
-        return outputs, batch_y
+        return outputs_, batch_y

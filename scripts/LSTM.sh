@@ -2,7 +2,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/ \
   --model_id trace_96_96 \
-  --model Reformer \
+  --model LSTM \
   --features SYSCALL \
   --seq_len 96 \
   --label_len 76 \
@@ -24,7 +24,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/ \
   --model_id trace_96_128 \
-  --model Reformer \
+  --model LSTM \
   --features SYSCALL \
   --seq_len 96 \
   --label_len 96 \
@@ -46,7 +46,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/ \
   --model_id trace_96_192 \
-  --model Reformer \
+  --model LSTM \
   --features SYSCALL \
   --seq_len 96 \
   --label_len 96 \
@@ -68,7 +68,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/ \
   --model_id trace_96_268 \
-  --model Reformer \
+  --model LSTM \
   --features SYSCALL \
   --seq_len 96 \
   --label_len 96 \

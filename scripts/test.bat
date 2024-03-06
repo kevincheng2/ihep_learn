@@ -1,13 +1,13 @@
-D:\Anaconda3\envs\pytorch\python.exe -u test.py ^
+D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
   --is_training 1 ^
   --root_path ./dataset/ ^
   --model_id trace_96_96 ^
-  --model Autoformer ^
+  --model LSTM ^
   --features SYSCALL ^
   --seq_len 96 ^
   --label_len 76 ^
   --pred_len 96 ^
-  --e_layers 2 ^
+  --e_layers 4 ^
   --d_layers 1 ^
   --factor 3 ^
   --enc_in 21 ^
@@ -16,5 +16,5 @@ D:\Anaconda3\envs\pytorch\python.exe -u test.py ^
   --itr 1 ^
   --train_epochs 10 ^
   --gpu 4 ^
-  --batch_size 12 ^
-  --learning_rate 0.001 ^
+  --batch_size 2 ^
+  --learning_rate 0.0001 ^

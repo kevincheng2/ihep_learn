@@ -16,6 +16,6 @@ D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
   --itr 1 ^
   --train_epochs 10 ^
   --gpu 4 ^
-  --batch_size 10 ^
+  --batch_size 4 ^
   --learning_rate 0.0001 ^
   --criterion CEL ^

@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch import optim
 import numpy as np
 import warnings
+import torch.nn.functional as F
 
 warnings.filterwarnings('ignore')
 
@@ -88,7 +89,7 @@ class Actuator(object):
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
-        criterion = self._select_criterion()
+        criterion = self._select_criterion(self.args.criterion)
 
         if self.args.use_amp:
             scaler = torch.cuda.amp.GradScaler()
@@ -110,9 +111,21 @@ class Actuator(object):
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
+                if self.args.criterion == "CEL":
+                    batch_y = torch.max(batch_y, dim=-1)[1]
+                    outputs = outputs.permute(0, 2, 1)
+
                 loss = criterion(outputs, batch_y)
                 loss.requires_grad_(True)
-                acc = float((outputs == batch_y).sum().item()) / outputs.numel()
+
+                if self.args.criterion == "CEL":
+                    acc_outputs = torch.max(outputs.permute(0, 2, 1), dim=-1)[1]
+                    acc_y = batch_y
+                else:
+                    acc_outputs = torch.max(outputs, dim=-1)[1]
+                    acc_y = torch.max(batch_y, dim=-1)[1]
+
+                acc = float((acc_outputs == acc_y).sum().item()) / acc_outputs.numel()
 
                 train_loss.append(loss.item())
                 train_acc.append(acc)
@@ -139,7 +152,7 @@ class Actuator(object):
             vali_loss = self.vali(vali_data, vali_loader, criterion)
             test_loss = self.vali(test_data, test_loader, criterion)
 
-            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Train Acc: {2:.4f}% Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
+            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Train Acc: {3:.4f}% Vali Loss: {4:.7f} Test Loss: {5:.7f}".format(
                 epoch + 1, train_steps, train_loss, train_acc, vali_loss, test_loss))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
@@ -255,8 +268,13 @@ class Actuator(object):
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         return model_optim
 
-    def _select_criterion(self):
-        criterion = nn.MSELoss(reduction="mean")
+    def _select_criterion(self, flag):
+        if flag == "MSE":
+            criterion = nn.MSELoss(reduction="mean")
+        elif flag == "CEL":
+            criterion = nn.CrossEntropyLoss(reduction="mean")
+        elif flag == "MLM":
+            criterion = nn.MultiLabelMarginLoss(reduction='mean')
         return criterion
 
     def _predict(self, batch_x, batch_y, batch_x_mark, batch_y_mark):
@@ -281,6 +299,11 @@ class Actuator(object):
         outputs = outputs[:, -self.args.pred_len:, :]
         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
-        outputs_ = torch.max(outputs, dim=-1)[1].unsqueeze(dim=-1)
+        # outputs_ = torch.max(outputs, dim=-1)[1].unsqueeze(dim=-1)
+        batch_y = batch_y.squeeze(dim=-1).to(torch.int64)
+        batch_y_ = F.one_hot(batch_y, num_classes=self.args.c_out).float()
 
-        return outputs_, batch_y
+        # print("outputs.shape:", outputs.shape)
+        # print("batch_y_.shape:", batch_y_.shape)
+
+        return outputs, batch_y_

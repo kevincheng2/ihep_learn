@@ -76,6 +76,7 @@ def main():
     parser.add_argument('--freq', type=str, default='u', help='time frequency')
     parser.add_argument('--encoding_shape', type=int, default=11, help='encoding_shape')
     parser.add_argument('--scale', type=bool, default=False, help='use scale')
+    parser.add_argument('--criterion', type=str, default='MES', help='loss function')
 
     args = parser.parse_args()
 

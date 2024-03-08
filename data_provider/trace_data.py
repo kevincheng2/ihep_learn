@@ -322,7 +322,8 @@ class TraceDataset(Dataset):
         train_len = int(len(data) * self.type_map['train'])
         test_len = int(len(data) * self.type_map['test'])
         data_begin = [0, train_len-self.seq_len, train_len+test_len-self.seq_len]
-        data_end = [train_len, train_len+test_len, len(data)]
+        # data_end = [train_len, train_len+test_len, len(data)]
+        data_end = [len(data), train_len+test_len, len(data)]
         begin_index = data_begin[self.set_type]
         end_index = data_end[self.set_type]
 

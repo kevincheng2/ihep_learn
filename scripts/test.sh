@@ -15,7 +15,7 @@ python -u run.py \
   --c_out 393 \
   --itr 1 \
   --train_epochs 10 \
-  --gpu 4 \
+  --gpu 3 \
   --batch_size 32 \
   --learning_rate 0.001 \
   --criterion CEL \

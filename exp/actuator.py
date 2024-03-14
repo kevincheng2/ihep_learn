@@ -134,7 +134,7 @@ class Actuator(object):
                 train_loss.append(loss.item())
                 train_acc.append(acc)
 
-                if (i + 1) % 1 == 0:
+                if (i + 1) % 100 == 0:
                     print("\titers: {0:4d}, epoch: {1:2d} | loss: {2:.7f} | acc: {3:.2%}".format(i + 1, epoch + 1, loss.item(), acc), end=" ")
                     speed = (time.time() - time_now) / iter_count
                     left_time = speed * ((self.args.train_epochs - epoch) * train_steps - i)

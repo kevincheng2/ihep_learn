@@ -2,7 +2,7 @@ D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
   --is_training 1 ^
   --root_path ./dataset/ ^
   --model_id trace_96_96 ^
-  --model Transformer ^
+  --model LSTM ^
   --features SYSCALL ^
   --seq_len 96 ^
   --label_len 76 ^

@@ -134,8 +134,8 @@ class Actuator(object):
                 train_loss.append(loss.item())
                 train_acc.append(acc)
 
-                if (i + 1) % 100 == 0:
-                    print("\titers: {0:4.}, epoch: {1:2.} | loss: {2:.7f} | acc: {3:.2%}".format(i + 1, epoch + 1, loss.item(), acc), end=" ")
+                if (i + 1) % 1 == 0:
+                    print("\titers: {0:4d}, epoch: {1:2d} | loss: {2:.7f} | acc: {3:.2%}".format(i + 1, epoch + 1, loss.item(), acc), end=" ")
                     speed = (time.time() - time_now) / iter_count
                     left_time = speed * ((self.args.train_epochs - epoch) * train_steps - i)
                     print('| speed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
@@ -156,7 +156,7 @@ class Actuator(object):
             vali_loss = self.vali(vali_data, vali_loader, criterion)
             test_loss = self.vali(test_data, test_loader, criterion)
 
-            print("Epoch: {0:2.}, Steps: {1:1.} | Train Loss: {2:.7f} Train Acc: {3:.4%} Vali Loss: {4:.7f} Test Loss: {5:.7f}".format(
+            print("Epoch: {0:2d}, Steps: {1:1d} | Train Loss: {2:.7f} Train Acc: {3:.4%} Vali Loss: {4:.7f} Test Loss: {5:.7f}".format(
                 epoch + 1, train_steps, train_loss, train_acc, vali_loss, test_loss))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:

@@ -1,5 +1,5 @@
 python -u run.py \
-  --is_training 1 \
+  --is_training 0 \
   --root_path ./dataset/ \
   --model_id trace_96_96 \
   --model LSTM \
@@ -16,6 +16,6 @@ python -u run.py \
   --itr 1 \
   --train_epochs 10 \
   --gpu 3 \
-  --batch_size 32 \
+  --batch_size 80 \
   --learning_rate 0.001 \
   --criterion CEL \

@@ -307,7 +307,7 @@ class Actuator(object):
         batch_y = batch_y.squeeze(dim=-1).to(torch.int64)
         batch_y_ = F.one_hot(batch_y, num_classes=self.args.c_out).float()
 
-        print("outputs.shape:", outputs.shape)
-        print("batch_y_.shape:", batch_y_.shape)
+        # print("outputs.shape:", outputs.shape)
+        # print("batch_y_.shape:", batch_y_.shape)
 
         return outputs, batch_y_

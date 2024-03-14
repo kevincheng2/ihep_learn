@@ -16,7 +16,7 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 3 \
-  --batch_size 64 \
+  --batch_size 80 \
   --learning_rate 0.0001 \
 
 
@@ -38,7 +38,7 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 3 \
-  --batch_size 64 \
+  --batch_size 80 \
   --learning_rate 0.0001 \
 
 
@@ -60,7 +60,7 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 3 \
-  --batch_size 64 \
+  --batch_size 80 \
   --learning_rate 0.0001 \
 
 
@@ -82,5 +82,5 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 3 \
-  --batch_size 64 \
+  --batch_size 80 \
   --learning_rate 0.0001 \

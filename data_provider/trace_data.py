@@ -266,7 +266,7 @@ class TraceDataset(Dataset):
         self.device = device
         self.file_path = trace_path
         
-        self.type_map = {'train': 0.6, 'val': 0.2, 'test': 0.2}
+        self.type_map = {'train': 0.6, 'val': 0.1, 'test': 0.1}
         flag_map = {'train': 0, 'test': 1, 'val': 2}
         assert flag in ['train', 'test', 'val']
         self.set_type = flag_map[flag]

@@ -77,7 +77,7 @@ class Model(nn.Module):
             ],
             norm_layer=my_Layernorm(configs.d_model),
             projection=nn.Linear(configs.d_model, configs.c_out, bias=True),
-            trans_linear=nn.Linear(336, configs.c_out)
+            trans_linear=nn.Linear(489, configs.c_out)
         )
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec,

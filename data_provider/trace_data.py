@@ -294,25 +294,19 @@ class TraceDataset(Dataset):
             return
         
         self.scaler = StandardScaler()
-        embedding_path = os.path.join(trace_dir, "embedding_onehot.csv")
-        encoding_path = os.path.join(trace_dir, "encoding_data.csv")
-        label_path = os.path.join(trace_dir, "label_data.csv")
+        traces_path = os.path.join(trace_dir, "traces_dataset.csv")
 
-        embeding_dataset = pd.read_csv(embedding_path, encoding='utf-8', index_col=False, header=None)
-        encoding_dataset = pd.read_csv(encoding_path, encoding='utf-8')
-        label_dataset = pd.read_csv(label_path, encoding='utf-8')
-        embeding_dataset.fillna("0", inplace=True)
-        encoding_dataset.fillna("-1", inplace=True)
+        traces_dataset = pd.read_csv(traces_path, encoding='utf-8')
+        traces_dataset.fillna("0", inplace=True)
+        traces_dataset.fillna("-1", inplace=True)
 
         # label 增加一列，标签对应的数字
-        label_dataset['nums'] = label_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
+        traces_dataset['nums'] = traces_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
 
         # 开始处理数据
-        data_stamp = time_features(pd.to_datetime(encoding_dataset['evt_time'].values, unit='ns'), freq=self.freq)
-        encoding_set = encoding_dataset.drop(["evt_time", "evt_deltatime"], axis=1).values
-        label_set = label_dataset.drop(["syscall_type"], axis=1).values
-        data = np.concatenate((np.concatenate((embeding_dataset.values, encoding_set), axis=1), label_set), axis=1)
-        data = torch.tensor(data.astype(float), dtype=torch.float32)
+        data_stamp = time_features(pd.to_datetime(traces_dataset['evt_time'].values, unit='ns'), freq=self.freq)
+        trans_set = traces_dataset.drop(["evt_time", "evt_deltatime", "syscall_type"], axis=1).values
+        data = torch.tensor(trans_set.astype(float), dtype=torch.float32)
         
         if self.scale:
             data = self.scaler.fit_transform(data)
@@ -376,7 +370,8 @@ if __name__ == '__main__':
     # index_json, vocab_dict, n_syscall = load_dataset_info(standard_path=standard_path, device=device)
 
     # format_file_path = os.path.join(save_dir, "BES_399865")
-    data_set_path = r"/mnt/workspace/Autoformer/dataset"
+    # data_set_path = r"/mnt/workspace/Autoformer/dataset"
+    data_set_path = r"C:\Users\dell\Documents\vsCode\Autoformer\dataset"
     dataset = TraceDataset(trace_path=data_set_path, device=device)
     # train_iter = dataset.get_varlen_iter()
 

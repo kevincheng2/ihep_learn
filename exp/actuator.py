@@ -64,6 +64,10 @@ class Actuator(object):
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
+                if self.args.criterion == "CEL":
+                    batch_y = torch.max(batch_y, dim=-1)[1]
+                    outputs = outputs.permute(0, 2, 1)
+
                 pred = outputs.detach().cpu()
                 true = batch_y.detach().cpu()
 
@@ -131,7 +135,7 @@ class Actuator(object):
                 train_acc.append(acc)
 
                 if (i + 1) % 100 == 0:
-                    print("\titers: {0}, epoch: {1} | loss: {2:.7f} | acc: {3:.2%}".format(i + 1, epoch + 1, loss.item(), acc), end=" ")
+                    print("\titers: {0:4.}, epoch: {1:2.} | loss: {2:.7f} | acc: {3:.2%}".format(i + 1, epoch + 1, loss.item(), acc), end=" ")
                     speed = (time.time() - time_now) / iter_count
                     left_time = speed * ((self.args.train_epochs - epoch) * train_steps - i)
                     print('| speed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
@@ -152,7 +156,7 @@ class Actuator(object):
             vali_loss = self.vali(vali_data, vali_loader, criterion)
             test_loss = self.vali(test_data, test_loader, criterion)
 
-            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Train Acc: {3:.4f}% Vali Loss: {4:.7f} Test Loss: {5:.7f}".format(
+            print("Epoch: {0:2.}, Steps: {1:1.} | Train Loss: {2:.7f} Train Acc: {3:.4%} Vali Loss: {4:.7f} Test Loss: {5:.7f}".format(
                 epoch + 1, train_steps, train_loss, train_acc, vali_loss, test_loss))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
@@ -303,7 +307,7 @@ class Actuator(object):
         batch_y = batch_y.squeeze(dim=-1).to(torch.int64)
         batch_y_ = F.one_hot(batch_y, num_classes=self.args.c_out).float()
 
-        # print("outputs.shape:", outputs.shape)
-        # print("batch_y_.shape:", batch_y_.shape)
+        print("outputs.shape:", outputs.shape)
+        print("batch_y_.shape:", batch_y_.shape)
 
         return outputs, batch_y_

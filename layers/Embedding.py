@@ -49,8 +49,7 @@ class PositionalEmbedding(nn.Module):
 class TokenEmbedding(nn.Module):
     def __init__(self, c_in, d_model, device):
         super(TokenEmbedding, self).__init__()
-        padding = 1 if compared_version(torch.__version__, '1.5.0') else 2
-        self.tokenLinear = nn.Linear(d_model*325, d_model)
+        self.tokenLinear = nn.Linear(d_model*478, d_model)
         self.encoddingLinear = nn.Linear(11, int(d_model/2))
         for m in self.modules():
             if isinstance(m, nn.Conv1d):
@@ -107,7 +106,7 @@ class TimeFeatureEmbedding(nn.Module):
 
 
 class DataEmbedding(nn.Module):
-    def __init__(self, c_in, d_model, device, freq='u', dropout=0.1, encoding_shape=9):
+    def __init__(self, c_in, d_model, device, freq='u', dropout=0.1, encoding_shape=11):
         super(DataEmbedding, self).__init__()
 
         self.encoding_shape = encoding_shape

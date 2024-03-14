@@ -17,7 +17,7 @@ python -u run.py \
   --c_out 393 \
   --itr 1 \
   --train_epochs 64 \
-  --gpu 3 \
+  --gpu 0 \
   --batch_size 32 \
   --learning_rate 0.001 \
   --lradj "type2" \
@@ -40,7 +40,7 @@ python -u run.py \
   --c_out 393 \
   --itr 1 \
   --train_epochs 64 \
-  --gpu 3 \
+  --gpu 0 \
   --batch_size 32 \
   --learning_rate 0.001 \
   --lradj "type2" \
@@ -63,7 +63,7 @@ python -u run.py \
   --c_out 393 \
   --itr 1 \
   --train_epochs 64 \
-  --gpu 3 \
+  --gpu 0 \
   --batch_size 32 \
   --learning_rate 0.001 \
   --lradj "type2" \
@@ -86,7 +86,7 @@ python -u run.py \
   --c_out 393 \
   --itr 1 \
   --train_epochs 64 \
-  --gpu 3 \
+  --gpu 0 \
   --batch_size 32 \
   --learning_rate 0.001 \
   --lradj "type2" \

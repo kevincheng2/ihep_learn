@@ -1,3 +1,5 @@
+export CUDA_VISIBLE_DEVICES=3
+
 python -u run.py \
   --is_training 0 \
   --root_path ./dataset/ \

@@ -21,6 +21,7 @@ python -u run.py \
   --batch_size 32 \
   --learning_rate 0.001 \
   --lradj "type2" \
+  --criterion CEL \
 
 
 python -u run.py \
@@ -41,9 +42,10 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 0 \
-  --batch_size 32 \
+  --batch_size 28 \
   --learning_rate 0.001 \
   --lradj "type2" \
+  --criterion CEL \
 
 
 python -u run.py \
@@ -64,9 +66,10 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 0 \
-  --batch_size 32 \
+  --batch_size 24 \
   --learning_rate 0.001 \
   --lradj "type2" \
+  --criterion CEL \
 
 
 python -u run.py \
@@ -87,7 +90,7 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 0 \
-  --batch_size 32 \
+  --batch_size 20 \
   --learning_rate 0.001 \
   --lradj "type2" \
-
+  --criterion CEL \

@@ -108,8 +108,12 @@ class AutoCorrelation(nn.Module):
             keys = keys[:, :L, :, :]
 
         # period-based dependencies
-        q_fft = torch.fft.rfft(queries.permute(0, 2, 3, 1).contiguous(), dim=-1)
-        k_fft = torch.fft.rfft(keys.permute(0, 2, 3, 1).contiguous(), dim=-1)
+        q_fft = torch.rfft
+        q_fft = torch.fft.rfft2(queries.permute(0, 2, 3, 1).contiguous(), dim=-1)
+        q_fft = torch.stack((q_fft.real, q_fft.imag), -1)
+
+        k_fft = torch.fft.rfft2(keys.permute(0, 2, 3, 1).contiguous(), dim=-1)
+        k_fft = torch.stack((k_fft.real, k_fft.imag), -1)
         res = q_fft * torch.conj(k_fft)
         corr = torch.fft.irfft(res, n=L, dim=-1)
 

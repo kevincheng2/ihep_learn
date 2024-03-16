@@ -128,7 +128,7 @@ python -u run.py \
   --itr 1 \
   --train_epochs 64 \
   --gpu 0 \
-  --batch_size 46 \
+  --batch_size 40 \
   --learning_rate 0.0001 \
 
 
@@ -150,5 +150,5 @@ python -u run.py \
   --itr 1 \
   --train_epochs 60 \
   --gpu 0 \
-  --batch_size 32 \
+  --batch_size 20 \
   --learning_rate 0.0001 \

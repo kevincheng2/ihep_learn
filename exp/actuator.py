@@ -247,7 +247,7 @@ class Actuator(object):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
         
-        criterion = nn.CrossEntropyLoss(ignore_index=0, reduction="none")
+        criterion = nn.CrossEntropyLoss(reduction="none")
         criterion.cuda(self.device)
 
         self.model.eval()

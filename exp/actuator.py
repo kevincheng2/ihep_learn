@@ -268,10 +268,10 @@ class Actuator(object):
 
                 loss = criterion(outputs_c, batch_y_c)
                 loss = loss.reshape(batch_y_c.shape)
-                print(loss)
                 loss = torch.sum(loss, 1)
                 print(loss)
                 perplexity_list.extend(torch.exp(loss).cpu().detach().tolist())
+                print(torch.exp(loss).cpu().tolist())
 
                 pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 true = torch.max(batch_y, dim=-1)[1]    # .squeeze()

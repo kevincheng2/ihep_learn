@@ -265,16 +265,15 @@ class Actuator(object):
                 pred = pred.detach().cpu().numpy()
                 true = true.detach().cpu().numpy()
 
-                print("pred shape: ", pred[2].shape)
-                print("true shape: ", true[1].shape)
-
                 for idx in range(self.args.batch_size):
+                    y_pred = pred[idx].view(-1)
+                    y_true = true[idx].view(-1)
                     precision.append(
-                        skmetrics.precision_score(true[idx], pred[idx])
+                        skmetrics.precision_score(y_true, y_pred)
                     )
-                    recall.append(skmetrics.recall_score(true[idx], pred[idx]))
-                    accuracy.append(skmetrics.accuracy_score(true[idx], pred[idx]))
-                    fscore.append(skmetrics.f1_score(true[idx], pred[idx]))
+                    recall.append(skmetrics.recall_score(y_true, y_pred))
+                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
+                    fscore.append(skmetrics.f1_score(y_true, y_pred))
 
         id_best_threshold = np.argmax(fscore)
         print(id_best_threshold)

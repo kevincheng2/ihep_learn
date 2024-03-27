@@ -4,7 +4,7 @@ python -u run.py \
   --is_training 2 \
   --root_path /home/zjm/workspace/dataset/ \
   --model_id trace_96_96 \
-  --model LSTM \
+  --model Informer \
   --features SYSCALL \
   --seq_len 96 \
   --label_len 76 \

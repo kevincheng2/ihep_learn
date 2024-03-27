@@ -77,8 +77,7 @@ def main():
     parser.add_argument('--encoding_shape', type=int, default=11, help='encoding_shape')
     parser.add_argument('--scale', type=bool, default=False, help='use scale')
     parser.add_argument('--criterion', type=str, default='MSE', help='loss function')
-
-    parser.add_argument('--train_load', type=bool, default=False, help='load model')
+    parser.add_argument('--train_load', action='store_true', default=False, help='load model')
 
     args = parser.parse_args()
 

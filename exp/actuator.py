@@ -87,8 +87,9 @@ class Actuator(object):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        if setting.train_load:
+        if self.args.train_load:
             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth'), map_location=self.device))
+            print("load model success.")
 
         time_now = time.time()
 

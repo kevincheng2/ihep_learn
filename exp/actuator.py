@@ -263,13 +263,18 @@ class Actuator(object):
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
-                batch_y = torch.max(batch_y, dim=-1)[1]
-                outputs = outputs.permute(0, 2, 1)
+                batch_y_c = torch.max(batch_y, dim=-1)[1]
+                outputs_c = outputs.permute(0, 2, 1)
 
-                loss = criterion(outputs, batch_y)
-                loss = loss.reshape(batch_y.shape)
+                loss = criterion(outputs_c, batch_y_c)
+                loss = loss.reshape(batch_y_c.shape)
                 loss = torch.sum(loss, 1)
                 perplexity_list.append(torch.exp(loss).cpu().detach().tolist())
+
+                pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
+                true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
+                pred = pred.detach().cpu().numpy()
+                true = true.detach().cpu().numpy()
 
                 for idx in range(self.args.batch_size):
                     y_pred = pred[idx].flatten()

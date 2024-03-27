@@ -301,6 +301,8 @@ class TraceDataset(Dataset):
         traces_dataset.fillna("0", inplace=True)
         traces_dataset.fillna("-1", inplace=True)
 
+        print(traces_dataset.columns.to_list())
+
         # label 增加一列，标签对应的数字
         traces_dataset['nums'] = traces_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
 

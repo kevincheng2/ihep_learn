@@ -282,7 +282,7 @@ class Actuator(object):
                     precision.append(
                         skmetrics.precision_score(y_true, y_pred, average='micro')
                     )
-                    recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
+                    recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))  
                     accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
                     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
@@ -292,6 +292,9 @@ class Actuator(object):
         print("precision: ", precision[id_best_threshold])
         print("accuracy: ", accuracy[id_best_threshold])
         print("recall: ", recall[id_best_threshold])
+
+        print("min val: ", min(perplexity_list))
+        print("min val: ", max(perplexity_list))
 
         thresholds = np.arange(min(perplexity_list), max(perplexity_list),
                                step=(max(perplexity_list) - min(perplexity_list)) / 100)

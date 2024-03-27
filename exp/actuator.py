@@ -266,8 +266,8 @@ class Actuator(object):
                 true = true.detach().cpu().numpy()
 
                 for idx in range(self.args.batch_size):
-                    y_pred = pred[idx].view(-1)
-                    y_true = true[idx].view(-1)
+                    y_pred = pred[idx].flatten()
+                    y_true = true[idx].flatten()
                     precision.append(
                         skmetrics.precision_score(y_true, y_pred)
                     )

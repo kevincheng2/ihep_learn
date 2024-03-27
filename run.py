@@ -144,7 +144,7 @@ def main():
                 args.distil,
                 ii)
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-        execute.odd_detection(setting, test=True)
+        execute.odd_detection(setting)
 
     else:
         ii = 0

@@ -267,8 +267,8 @@ class TraceDataset(Dataset):
         self.file_path = trace_path
         
         self.type_map = {'train': 0.8, 'val': 0.1, 'test': 0.1}
-        flag_map = {'train': 0, 'test': 1, 'val': 2}
-        assert flag in ['train', 'test', 'val']
+        flag_map = {'train': 0, 'test': 1, 'val': 2, 'detection': 3}
+        assert flag in ['train', 'test', 'val', 'detection']
         self.set_type = flag_map[flag]
         self.flag = flag
         self.scale = scale
@@ -306,9 +306,11 @@ class TraceDataset(Dataset):
         # label 增加一列，标签对应的数字
         traces_dataset['nums'] = traces_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
 
+        print(traces_dataset.columns.to_list())
+
         # 开始处理数据
         data_stamp = time_features(pd.to_datetime(traces_dataset['evt_time'].values, unit='ns'), freq=self.freq)
-        trans_set = traces_dataset.drop(["evt_time", "dirfd", "syscall_type"], axis=1).values
+        trans_set = traces_dataset.drop(["evt_time", "evt_deltatime", "syscall_type"], axis=1).values
         data = torch.tensor(trans_set.astype(float), dtype=torch.float32)
         
         if self.scale:

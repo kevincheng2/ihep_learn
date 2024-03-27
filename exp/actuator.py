@@ -238,7 +238,7 @@ class Actuator(object):
         return
 
     def odd_detection(self, setting):
-        train_data, train_loader = self._get_data(flag='detection')
+        train_data, train_loader = self._get_data(flag='val')
 
         print('loading model')
         self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth'), map_location=self.device))

@@ -270,9 +270,7 @@ class Actuator(object):
                 loss = loss.reshape(batch_y_c.shape)
                 loss = torch.sum(loss, 1)
                 perplexity_res = (loss - torch.mean(loss))/torch.std(loss)
-                print(perplexity_res)
                 perplexity_list.extend(torch.exp(perplexity_res).cpu().detach().tolist())
-                print(torch.exp(perplexity_res).cpu().tolist())
 
                 pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
@@ -290,23 +288,15 @@ class Actuator(object):
                     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
         id_best_threshold = np.argmax(fscore)
-        print(id_best_threshold)
-        print("fscore: ", fscore[id_best_threshold])
-        print("precision: ", precision[id_best_threshold])
-        print("accuracy: ", accuracy[id_best_threshold])
-        print("recall: ", recall[id_best_threshold])
+        # thresholds = np.arange(min(perplexity_list), max(perplexity_list),
+        #                        step=(max(perplexity_list) - min(perplexity_list)) / 100)
 
-        print("min val: ", min(perplexity_list))
-        print("min val: ", max(perplexity_list))
+        best_perplexity = perplexity_list[id_best_threshold]
 
-        thresholds = np.arange(min(perplexity_list), max(perplexity_list),
-                               step=(max(perplexity_list) - min(perplexity_list)) / 100)
-
-        best_precision = thresholds[id_best_threshold]
-
-        print("best_precision val: ", best_precision)
+        print("best_perplexity val: ", best_perplexity)
 
         odd_data, odd_loader = self._get_data(flag='detection')
+        odd_perplexity = []
 
         self.model.eval()
         with torch.no_grad():
@@ -325,41 +315,79 @@ class Actuator(object):
                 loss = criterion(outputs_c, batch_y_c)
                 loss = loss.reshape(batch_y_c.shape)
                 loss = torch.sum(loss, 1)
-                perplexity_list.append(torch.exp(loss).cpu().detach().tolist())
+                perplexity_res = (loss - torch.mean(loss))/torch.std(loss)
+                odd_perplexity.extend(torch.exp(perplexity_res).cpu().detach().tolist())
 
-                pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
-                true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
+                # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
+                # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
             
-                pred = pred.detach().cpu().numpy()
-                true = true.detach().cpu().numpy()
+                # pred = pred.detach().cpu().numpy()
+                # true = true.detach().cpu().numpy()
 
-                for idx in range(self.args.batch_size):
-                    y_pred = pred[idx].flatten()
-                    y_true = true[idx].flatten()
-                    precision.append(
-                        skmetrics.precision_score(y_true, y_pred, average='micro')
-                    )
-                    recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
-                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
-                    fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
+                # for idx in range(self.args.batch_size):
+                #     y_pred = pred[idx].flatten()
+                #     y_true = true[idx].flatten()
+                #     precision.append(
+                #         skmetrics.precision_score(y_true, y_pred, average='micro')
+                #     )
+                #     recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
+                #     accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
+                #     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
-        # # result save
-        # folder_path = './results/' + setting + '/'
-        # if not os.path.exists(folder_path):
-        #     os.makedirs(folder_path)
+        normal_data, normal_loader = self._get_data(flag='val')
+        normal_perplexity = []
 
-        # mae, mse, rmse, mape, mspe = metric(preds, trues)
-        # print('mse:{}, mae:{}'.format(mse, mae))
-        # f = open("result.txt", 'a')
-        # f.write(setting + "  \n")
-        # f.write('mse:{}, mae:{}'.format(mse, mae))
-        # f.write('\n')
-        # f.write('\n')
-        # f.close()
+        self.model.eval()
+        with torch.no_grad():
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(normal_loader):
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
 
-        # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
-        # np.save(folder_path + 'pred.npy', preds)
-        # np.save(folder_path + 'true.npy', trues)
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+
+                outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
+
+                batch_y_c = torch.max(batch_y, dim=-1)[1]
+                outputs_c = outputs.permute(0, 2, 1)
+
+                loss = criterion(outputs_c, batch_y_c)
+                loss = loss.reshape(batch_y_c.shape)
+                loss = torch.sum(loss, 1)
+                perplexity_res = (loss - torch.mean(loss))/torch.std(loss)
+                normal_perplexity.extend(torch.exp(perplexity_res).cpu().detach().tolist())
+
+                # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
+                # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
+            
+                # pred = pred.detach().cpu().numpy()
+                # true = true.detach().cpu().numpy()
+
+                # for idx in range(self.args.batch_size):
+                #     y_pred = pred[idx].flatten()
+                #     y_true = true[idx].flatten()
+                #     precision.append(
+                #         skmetrics.precision_score(y_true, y_pred, average='micro')
+                #     )
+                #     recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
+                #     accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
+                #     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
+
+        odd_test = odd_perplexity + normal_perplexity
+        y_true = [0] * len(odd_perplexity) + [1] * normal_perplexity
+        y_pred = [1 if p > best_perplexity else 0 for p in odd_test]
+
+        precision = skmetrics.precision_score(y_true, y_pred, average='micro')
+        recall = skmetrics.recall_score(y_true, y_pred, average='micro')
+        accuracy = skmetrics.accuracy_score(y_true, y_pred)
+        fscore = skmetrics.f1_score(y_true, y_pred, average='micro')
+        auroc = skmetrics.roc_auc_score(y_true, y_pred, average='micro')
+
+        print(f"{'    AUROC':30}: {auroc:68.2%}")
+        print(f"{'    Recall':30}: {recall:68.2%}")
+        print(f"{'    Precision':30}: {precision:68.2%}")
+        print(f"{'    F-score':30}: {fscore:68.2%}")
+        print(f"{'    Accuracy':30}: {accuracy:68.2%}")
 
         return
     

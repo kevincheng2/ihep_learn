@@ -262,6 +262,9 @@ class Actuator(object):
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
+                batch_y = torch.max(batch_y, dim=-1)[1]
+                outputs = outputs.permute(0, 2, 1)
+
                 # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
             

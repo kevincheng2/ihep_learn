@@ -193,11 +193,11 @@ class Actuator(object):
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
-                outputs = outputs.detach().cpu().numpy()
-                batch_y = batch_y.detach().cpu().numpy()
-
                 pred = torch.max(outputs, dim=-1)[1] # outputs.detach().cpu().numpy()  # .squeeze()
                 true = torch.max(batch_y, dim=-1)[1]  # batch_y.detach().cpu().numpy()  # .squeeze()
+            
+                pred = pred.detach().cpu().numpy()
+                true = true.detach().cpu().numpy()
 
                 preds.append(pred)
                 trues.append(true)

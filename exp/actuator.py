@@ -252,6 +252,7 @@ class Actuator(object):
 
         self.model.eval()
         accuracy, precision, recall, fscore = [], [], [], []
+        perplexity_list = []
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
                 batch_x = batch_x.float().to(self.device)
@@ -265,19 +266,10 @@ class Actuator(object):
                 batch_y = torch.max(batch_y, dim=-1)[1]
                 outputs = outputs.permute(0, 2, 1)
 
-                # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
-                # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
-            
-                # pred = pred.detach().cpu().numpy()
-                # true = true.detach().cpu().numpy()
-
-                print("batch_y shape: ", batch_y.shape)
                 loss = criterion(outputs, batch_y)
-                print("loss shape: ", loss.shape)
                 loss = loss.reshape(batch_y.shape)
-                print("loss shape: ", loss.shape)
                 loss = torch.sum(loss, 1)
-                print("result : ", torch.exp(loss).cpu().detach().tolist())
+                perplexity_list.append(torch.exp(loss).cpu().detach().tolist())
 
                 for idx in range(self.args.batch_size):
                     y_pred = pred[idx].flatten()
@@ -296,7 +288,12 @@ class Actuator(object):
         print("accuracy: ", accuracy[id_best_threshold])
         print("recall: ", recall[id_best_threshold])
 
-        best_precision = precision[id_best_threshold]
+        thresholds = np.arange(min(perplexity_list), max(perplexity_list), 
+                               step=(max(perplexity_list) - min(perplexity_list)) / 100)
+
+        best_precision = thresholds[id_best_threshold]
+
+        print("best_precision val: ", best_precision)
 
         odd_data, odd_loader = self._get_data(flag='detection')
 

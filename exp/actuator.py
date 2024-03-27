@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 import numpy as np
-import sklearn
+import sklearn.metrics as skmetrics
 import warnings
 import torch.nn.functional as F
 
@@ -266,11 +266,11 @@ class Actuator(object):
                 true = true.detach().cpu().numpy()
 
                 precision.append(
-                    sklearn.metrics.precision_score(true, pred)
+                    skmetrics.precision_score(true, pred)
                 )
-                recall.append(sklearn.metrics.recall_score(true, pred))
-                accuracy.append(sklearn.metrics.accuracy_score(true, pred))
-                fscore.append(sklearn.metrics.f1_score(true, pred))
+                recall.append(skmetrics.recall_score(true, pred))
+                accuracy.append(skmetrics.accuracy_score(true, pred))
+                fscore.append(skmetrics.f1_score(true, pred))
 
         id_best_threshold = np.argmax(fscore)
         print(id_best_threshold)

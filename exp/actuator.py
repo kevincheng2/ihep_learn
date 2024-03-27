@@ -374,7 +374,7 @@ class Actuator(object):
                 #     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
         odd_test = odd_perplexity + normal_perplexity
-        y_true = [0] * len(odd_perplexity) + [1] * normal_perplexity
+        y_true = [0] * len(odd_perplexity) + [1] * len(normal_perplexity)
         y_pred = [1 if p > best_perplexity else 0 for p in odd_test]
 
         precision = skmetrics.precision_score(y_true, y_pred, average='micro')

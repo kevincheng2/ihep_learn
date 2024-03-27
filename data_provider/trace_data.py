@@ -304,12 +304,12 @@ class TraceDataset(Dataset):
         # label 增加一列，标签对应的数字
         traces_dataset['nums'] = traces_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
 
-        traces_dataset.loc[traces_dataset['dirfd'].notnull(), 'dirfd'] = 1
+        # traces_dataset.loc[traces_dataset['dirfd'].notnull(), 'dirfd'] = 1
 
         # 开始处理数据
         data_stamp = time_features(pd.to_datetime(traces_dataset['evt_time'].values, unit='ns'), freq=self.freq)
         # trans_set = traces_dataset.drop(["evt_time", "evt_deltatime", "syscall_type"], axis=1).values
-        trans_set = traces_dataset.drop(["evt_time", "syscall_type"], axis=1).values
+        trans_set = traces_dataset.drop(["evt_time", "dirfd", "syscall_type"], axis=1).values
         data = torch.tensor(trans_set.astype(float), dtype=torch.float32)
         
         if self.scale:

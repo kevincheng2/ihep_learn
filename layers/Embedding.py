@@ -114,7 +114,7 @@ class DataEmbedding(nn.Module):
                                               d_model=d_model,
                                               device=device)
         self.position_embedding = PositionalEmbedding(d_model=d_model)
-        self.temporal_embedding =  TimeFeatureEmbedding(d_model=d_model, freq=freq)
+        self.temporal_embedding = TimeFeatureEmbedding(d_model=d_model, freq=freq)
         self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x, x_mark):

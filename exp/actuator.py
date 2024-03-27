@@ -109,6 +109,10 @@ class Actuator(object):
             self.model.train()
             epoch_time = time.time()
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+                print("batch_x shape: ", batch_x.shape)
+                print("batch_y shape: ", batch_y.shape)
+                print("batch_x_mark shape: ", batch_x_mark.shape)
+                print("batch_y_mark shape: ", batch_y_mark.shape)
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)

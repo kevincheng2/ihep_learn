@@ -19,5 +19,3 @@ D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
   --batch_size 1 ^
   --learning_rate 0.001 ^
   --lradj type2 ^
-  --train_load ^
-  

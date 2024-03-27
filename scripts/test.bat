@@ -1,6 +1,6 @@
 D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
   --is_training 1 ^
-  --root_path ./dataset/ ^
+  --root_path D:\dataset\trace_dataset ^
   --model_id trace_96_96 ^
   --model Autoformer ^
   --features SYSCALL ^

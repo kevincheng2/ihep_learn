@@ -269,7 +269,7 @@ class Actuator(object):
                 loss = criterion(outputs_c, batch_y_c)
                 loss = loss.reshape(batch_y_c.shape)
                 loss = torch.sum(loss, 1)
-                perplexity_list.append(torch.exp(loss).cpu().detach().tolist())
+                perplexity_list.extend(torch.exp(loss).cpu().detach().tolist())
 
                 pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
@@ -293,7 +293,7 @@ class Actuator(object):
         print("accuracy: ", accuracy[id_best_threshold])
         print("recall: ", recall[id_best_threshold])
 
-        thresholds = np.arange(min(perplexity_list), max(perplexity_list), 
+        thresholds = np.arange(min(perplexity_list), max(perplexity_list),
                                step=(max(perplexity_list) - min(perplexity_list)) / 100)
 
         best_precision = thresholds[id_best_threshold]
@@ -312,6 +312,14 @@ class Actuator(object):
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
                 outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
+
+                batch_y_c = torch.max(batch_y, dim=-1)[1]
+                outputs_c = outputs.permute(0, 2, 1)
+
+                loss = criterion(outputs_c, batch_y_c)
+                loss = loss.reshape(batch_y_c.shape)
+                loss = torch.sum(loss, 1)
+                perplexity_list.append(torch.exp(loss).cpu().detach().tolist())
 
                 pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 true = torch.max(batch_y, dim=-1)[1]    # .squeeze()

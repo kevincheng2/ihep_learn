@@ -265,8 +265,8 @@ class Actuator(object):
                 pred = pred.detach().cpu().numpy()
                 true = true.detach().cpu().numpy()
 
-                print("pred shape: ", pred.shape)
-                print("true shape: ", true.shape)
+                print("pred shape: ", pred[2].shape)
+                print("true shape: ", true[1].shape)
 
                 for idx in range(self.args.batch_size):
                     precision.append(

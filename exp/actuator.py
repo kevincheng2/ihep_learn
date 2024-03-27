@@ -269,11 +269,11 @@ class Actuator(object):
                     y_pred = pred[idx].flatten()
                     y_true = true[idx].flatten()
                     precision.append(
-                        skmetrics.precision_score(y_true, y_pred)
+                        skmetrics.precision_score(y_true, y_pred, average='micro')
                     )
-                    recall.append(skmetrics.recall_score(y_true, y_pred))
-                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
-                    fscore.append(skmetrics.f1_score(y_true, y_pred))
+                    recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
+                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred, average='micro'))
+                    fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
         id_best_threshold = np.argmax(fscore)
         print(id_best_threshold)

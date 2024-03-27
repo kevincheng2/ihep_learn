@@ -246,11 +246,60 @@ class Actuator(object):
         folder_path = './detection_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
+        
+        criterion = nn.CrossEntropyLoss(ignore_index=0, reduction="none")
+        criterion.cuda(self.device)
 
         self.model.eval()
         accuracy, precision, recall, fscore = [], [], [], []
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
+
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+
+                outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
+
+                # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
+                # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
+            
+                # pred = pred.detach().cpu().numpy()
+                # true = true.detach().cpu().numpy()
+
+                print("batch_y shape: ", batch_y.shape)
+                loss = criterion(outputs, batch_y)
+                print("loss shape: ", loss.shape)
+                loss = loss.reshape(batch_y.shape)
+                print("loss shape: ", loss.shape)
+                loss = torch.sum(loss, 1)
+                print("result : ", torch.exp(loss).cpu().detach().tolist())
+
+                for idx in range(self.args.batch_size):
+                    y_pred = pred[idx].flatten()
+                    y_true = true[idx].flatten()
+                    precision.append(
+                        skmetrics.precision_score(y_true, y_pred, average='micro')
+                    )
+                    recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
+                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
+                    fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
+
+        id_best_threshold = np.argmax(fscore)
+        print(id_best_threshold)
+        print("fscore: ", fscore[id_best_threshold])
+        print("precision: ", precision[id_best_threshold])
+        print("accuracy: ", accuracy[id_best_threshold])
+        print("recall: ", recall[id_best_threshold])
+
+        best_precision = precision[id_best_threshold]
+
+        odd_data, odd_loader = self._get_data(flag='detection')
+
+        self.model.eval()
+        with torch.no_grad():
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(odd_loader):
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
 
@@ -272,26 +321,8 @@ class Actuator(object):
                         skmetrics.precision_score(y_true, y_pred, average='micro')
                     )
                     recall.append(skmetrics.recall_score(y_true, y_pred, average='micro'))
-                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred, average='micro'))
+                    accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
                     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
-
-        id_best_threshold = np.argmax(fscore)
-        print(id_best_threshold)
-        print("fscore: ", fscore[id_best_threshold])
-        print("precision: ", precision[id_best_threshold])
-        print("accuracy: ", accuracy[id_best_threshold])
-        print("recall: ", recall[id_best_threshold])
-
-        odd_data, odd_loader = self._get_data(flag='detection')
-
-        self.model.eval()
-        with torch.no_grad():
-            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(odd_loader):
-                batch_x = batch_x.float().to(self.device)
-                batch_y = batch_y.float().to(self.device)
-
-                batch_x_mark = batch_x_mark.float().to(self.device)
-                batch_y_mark = batch_y_mark.float().to(self.device)
 
         # # result save
         # folder_path = './results/' + setting + '/'

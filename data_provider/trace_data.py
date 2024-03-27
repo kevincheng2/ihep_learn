@@ -274,7 +274,10 @@ class TraceDataset(Dataset):
         self.scale = scale
 
         self.index_json, self.vocab_dict, self.out_syscall_len = get_data_index_json(self.file_path)
-        self.load_dataset()
+        if flag == 'detection':
+            self.load_odd_detection()
+        else:
+            self.load_dataset()
 
     def load_dataset_info(self):
         if not os.path.exists(self.file_path):
@@ -286,6 +289,35 @@ class TraceDataset(Dataset):
             index_json = json.load(f)
 
         return index_json, vocab_dict, len(vocab_dict)
+
+    def load_odd_detection(self):
+        trace_dir = os.path.abspath(os.path.join(self.file_path, "format_data"))
+        if not os.path.exists(trace_dir) :
+            print(f"file path /{trace_dir}/ is not exist ")
+            return
+        
+        self.scaler = StandardScaler()
+        traces_path = os.path.join(trace_dir, "trace_abnormal.csv")
+
+        traces_dataset = pd.read_csv(traces_path, encoding='utf-8')
+        traces_dataset.fillna("0", inplace=True)
+        traces_dataset.fillna("-1", inplace=True)
+
+        # label 增加一列，标签对应的数字
+        traces_dataset['nums'] = traces_dataset.apply(lambda row: self.vocab_dict[row['syscall_type']], axis=1)
+
+        # 开始处理数据
+        data_stamp = time_features(pd.to_datetime(traces_dataset['evt_time'].values, unit='ns'), freq=self.freq)
+        trans_set = traces_dataset.drop(["evt_time", "dirfd", "syscall_type"], axis=1).values
+        data = torch.tensor(trans_set.astype(float), dtype=torch.float32)
+        
+        if self.scale:
+            data = self.scaler.fit_transform(data)
+        data_stamp = data_stamp.transpose(1, 0)
+
+        self.data_x = data
+        self.data_y = data
+        self.data_stamp = data_stamp
 
     def load_dataset(self):
         trace_dir = os.path.abspath(os.path.join(self.file_path, "format_data"))

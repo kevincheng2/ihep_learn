@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 import numpy as np
+import sklearn
 import warnings
 import torch.nn.functional as F
 
@@ -109,10 +110,6 @@ class Actuator(object):
             self.model.train()
             epoch_time = time.time()
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
-                print("batch_x shape: ", batch_x.shape)
-                print("batch_y shape: ", batch_y.shape)
-                print("batch_x_mark shape: ", batch_x_mark.shape)
-                print("batch_y_mark shape: ", batch_y_mark.shape)
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)
@@ -237,6 +234,79 @@ class Actuator(object):
         np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
         np.save(folder_path + 'pred.npy', preds)
         np.save(folder_path + 'true.npy', trues)
+
+        return
+
+    def odd_detection(self, setting):
+        train_data, train_loader = self._get_data(flag='detection')
+
+        print('loading model')
+        self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth'), map_location=self.device))
+
+        folder_path = './detection_results/' + setting + '/'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        self.model.eval()
+        accuracy, precision, recall, fscore = [], [], [], []
+        with torch.no_grad():
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
+
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+
+                outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
+
+                pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
+                true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
+            
+                pred = pred.detach().cpu().numpy()
+                true = true.detach().cpu().numpy()
+
+                precision.append(
+                    sklearn.metrics.precision_score(true, pred)
+                )
+                recall.append(sklearn.metrics.recall_score(true, pred))
+                accuracy.append(sklearn.metrics.accuracy_score(true, pred))
+                fscore.append(sklearn.metrics.f1_score(true, pred))
+
+        id_best_threshold = np.argmax(fscore)
+        print(id_best_threshold)
+        print("fscore: ", fscore[id_best_threshold])
+        print("precision: ", precision[id_best_threshold])
+        print("accuracy: ", accuracy[id_best_threshold])
+        print("recall: ", recall[id_best_threshold])
+
+        odd_data, odd_loader = self._get_data(flag='detection')
+
+        self.model.eval()
+        with torch.no_grad():
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(odd_loader):
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
+
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+
+        # # result save
+        # folder_path = './results/' + setting + '/'
+        # if not os.path.exists(folder_path):
+        #     os.makedirs(folder_path)
+
+        # mae, mse, rmse, mape, mspe = metric(preds, trues)
+        # print('mse:{}, mae:{}'.format(mse, mae))
+        # f = open("result.txt", 'a')
+        # f.write(setting + "  \n")
+        # f.write('mse:{}, mae:{}'.format(mse, mae))
+        # f.write('\n')
+        # f.write('\n')
+        # f.close()
+
+        # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
+        # np.save(folder_path + 'pred.npy', preds)
+        # np.save(folder_path + 'true.npy', trues)
 
         return
     

@@ -94,7 +94,7 @@ def main():
 
     execute = Actuator(args)
 
-    if args.is_training:
+    if args.is_training == 1:
         for ii in range(args.itr):
             # setting record of experiments
             setting = '{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_dt{}_{}'.format(
@@ -125,6 +125,27 @@ def main():
             if args.use_gpu:
                 with torch.cuda.device("cuda:{}".format(args.gpu)):
                     torch.cuda.empty_cache()
+    elif args.is_training == 2: 
+        # odd detection
+        ii = 0
+        setting = '{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_dt{}_{}'.format(
+                args.model_id,
+                args.model,
+                args.features,
+                args.seq_len,
+                args.label_len,
+                args.pred_len,
+                args.d_model,
+                args.n_heads,
+                args.e_layers,
+                args.d_layers,
+                args.d_ff,
+                args.factor,
+                args.distil,
+                ii)
+        print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+        execute.odd_detection(setting, test=True)
+
     else:
         ii = 0
         setting = '{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_dt{}_{}'.format(

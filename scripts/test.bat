@@ -1,5 +1,5 @@
 D:\Anaconda3\envs\pytorch\python.exe -u run.py ^
-  --is_training 1 ^
+  --is_training 2 ^
   --root_path D:\dataset\trace_dataset\ ^
   --model_id trace_96_96 ^
   --model Autoformer ^

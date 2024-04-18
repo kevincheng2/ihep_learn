@@ -20,6 +20,8 @@ def data_provider(args, flag):
         flag=flag
     )
     print(flag, len(data_set))
+    data_set.show_shape()
+    
     data_loader = DataLoader(
         data_set,
         batch_size=args.batch_size,

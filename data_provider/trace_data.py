@@ -378,6 +378,10 @@ class TraceDataset(Dataset):
     
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
+    
+    def show_shape(self):
+        print(self.data_x.shape)
+        print(self.data_y.shape)
 
 
 if __name__ == '__main__':

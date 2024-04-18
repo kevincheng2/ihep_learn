@@ -334,28 +334,28 @@ class Actuator(object):
                 #     accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
                 #     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
-        normal_data, normal_loader = self._get_data(flag='val')
-        normal_perplexity = []
+        # normal_data, normal_loader = self._get_data(flag='val')
+        # normal_perplexity = []
 
-        self.model.eval()
-        with torch.no_grad():
-            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(normal_loader):
-                batch_x = batch_x.float().to(self.device)
-                batch_y = batch_y.float().to(self.device)
+        # self.model.eval()
+        # with torch.no_grad():
+        #     for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(normal_loader):
+        #         batch_x = batch_x.float().to(self.device)
+        #         batch_y = batch_y.float().to(self.device)
 
-                batch_x_mark = batch_x_mark.float().to(self.device)
-                batch_y_mark = batch_y_mark.float().to(self.device)
+        #         batch_x_mark = batch_x_mark.float().to(self.device)
+        #         batch_y_mark = batch_y_mark.float().to(self.device)
 
-                outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
+        #         outputs, batch_y = self._predict(batch_x, batch_y, batch_x_mark, batch_y_mark)
 
-                batch_y_c = torch.max(batch_y, dim=-1)[1]
-                outputs_c = outputs.permute(0, 2, 1)
+        #         batch_y_c = torch.max(batch_y, dim=-1)[1]
+        #         outputs_c = outputs.permute(0, 2, 1)
 
-                loss = criterion(outputs_c, batch_y_c)
-                loss = loss.reshape(batch_y_c.shape)
-                loss = torch.sum(loss, 1)
-                perplexity_res = (loss - torch.mean(loss))/torch.std(loss)
-                normal_perplexity.extend(torch.exp(perplexity_res).cpu().detach().tolist())
+        #         loss = criterion(outputs_c, batch_y_c)
+        #         loss = loss.reshape(batch_y_c.shape)
+        #         loss = torch.sum(loss, 1)
+        #         perplexity_res = (loss - torch.mean(loss))/torch.std(loss)
+        #         normal_perplexity.extend(torch.exp(perplexity_res).cpu().detach().tolist())
 
                 # pred = torch.max(outputs, dim=-1)[1]    # .squeeze()
                 # true = torch.max(batch_y, dim=-1)[1]    # .squeeze()
@@ -373,21 +373,30 @@ class Actuator(object):
                 #     accuracy.append(skmetrics.accuracy_score(y_true, y_pred))
                 #     fscore.append(skmetrics.f1_score(y_true, y_pred, average='micro'))
 
-        odd_test = odd_perplexity + normal_perplexity
-        y_true = [0] * len(odd_perplexity) + [1] * len(normal_perplexity)
-        y_pred = [0 if p > best_perplexity else 1 for p in odd_test]
+        # odd_test = odd_perplexity + normal_perplexity
+        # y_true = [0] * len(odd_perplexity) + [1] * len(normal_perplexity)
+        y_pred = [0 if p > best_perplexity else 1 for p in odd_perplexity]
 
-        precision = skmetrics.precision_score(y_true, y_pred, average='micro')
-        recall = skmetrics.recall_score(y_true, y_pred, average='micro')
-        accuracy = skmetrics.accuracy_score(y_true, y_pred)
-        fscore = skmetrics.f1_score(y_true, y_pred, average='micro')
-        auroc = skmetrics.roc_auc_score(y_true, y_pred, average='micro')
+        print(y_pred)
 
-        print(f"{'    AUROC':30}: {auroc:68.2%}")
-        print(f"{'    Recall':30}: {recall:68.2%}")
-        print(f"{'    Precision':30}: {precision:68.2%}")
-        print(f"{'    F-score':30}: {fscore:68.2%}")
-        print(f"{'    Accuracy':30}: {accuracy:68.2%}")
+        count = 0
+        for item in y_pred:
+            if item == 1:
+                count += 1
+        
+        print("results: " + count/len(y_pred))
+
+        # precision = skmetrics.precision_score(y_true, y_pred, average='micro')
+        # recall = skmetrics.recall_score(y_true, y_pred, average='micro')
+        # accuracy = skmetrics.accuracy_score(y_true, y_pred)
+        # fscore = skmetrics.f1_score(y_true, y_pred, average='micro')
+        # auroc = skmetrics.roc_auc_score(y_true, y_pred, average='micro')
+
+        # print(f"{'    AUROC':30}: {auroc:68.2%}")
+        # print(f"{'    Recall':30}: {recall:68.2%}")
+        # print(f"{'    Precision':30}: {precision:68.2%}")
+        # print(f"{'    F-score':30}: {fscore:68.2%}")
+        # print(f"{'    Accuracy':30}: {accuracy:68.2%}")
 
         return
     

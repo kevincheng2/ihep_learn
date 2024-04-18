@@ -297,7 +297,7 @@ class TraceDataset(Dataset):
             return
         
         self.scaler = StandardScaler()
-        traces_path = os.path.join(trace_dir, "trace_abnormal.csv")
+        traces_path = os.path.join(trace_dir, "trace_test1_17220.csv")
 
         traces_dataset = pd.read_csv(traces_path, encoding='utf-8')
         traces_dataset.fillna("0", inplace=True)

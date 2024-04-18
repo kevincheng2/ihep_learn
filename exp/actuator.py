@@ -384,7 +384,7 @@ class Actuator(object):
             if item == 1:
                 count += 1
         
-        print("results: " + count/len(y_pred))
+        print("results: " + str(count/len(y_pred)))
 
         # precision = skmetrics.precision_score(y_true, y_pred, average='micro')
         # recall = skmetrics.recall_score(y_true, y_pred, average='micro')
